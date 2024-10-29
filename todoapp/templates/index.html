@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>todo list</title>
+    {% load static %}  
+    <link rel="stylesheet" href="{% static 'todoapp/style.css' %}"> 
+    <style>
+        body{
+            background-color: #fff7da;
+            font-family: Verdana, Geneva, Tahoma, sans-serif;
+        }
+        nav { 
+            width: 100%;
+            display: flex;
+            align-items: center;
+            gap: 30px;
+            height: 50px;
+            justify-content: center;
+            background-color: #fbf0b8; 
+        }
+        a {
+            position: relative;
+            cursor: pointer;
+            color: #000000;
+            font-size: 16px;
+            padding: 0.5rem 1rem;
+            transition: color 0.25s;
+            font-family: Verdana, Geneva, Tahoma, sans-serif ;
+        }
+        a::after {
+            position: absolute;
+            content: "";
+            inset: 0;
+            background: white;
+            transform: scaleY(0);
+            z-index: -1;
+            transition: transform 0.45s;
+            border: 10px solid transparent; 
+        }
+        a:hover {
+            color: rgb(0, 0, 0);
+            transform: scale(1.1);
+        }
+        a:hover::after {
+            transform: scaleY(1);
+        }
+        h1{
+            font-family: Verdana, Geneva, Tahoma, sans-serif;
+        }
+        
+    </style>
+
+</head>
+<body>
+    <nav>
+        <a >Home</a>
+        <a >To complete</a>
+        <a >Completed</a>
+        <a >FAQ</a>
+      
+    </nav>
+
+    <div class="container">
+        <h1>Welcome! What do you need to do today?</h1>
+        <form action="{% url 'add_task' %}" method="POST">
+            {% csrf_token %}
+            <input type="text" name="task" placeholder="Add a new task..." required>
+            <button  type="submit">add task</button>
+        </form>
+        <ul>
+            {% for task in tasks %}
+                <li>
+                    <form action="{% url 'complete_task' task.id %}" method="POST" style="display:inline;">
+                        {% csrf_token %}
+                        <input type="checkbox" class="task-checkbox" onchange="this.form.submit()" {% if task.completed %}checked{% endif %}>
+                    </form>
+                    <span class="{% if task.completed %}completed{% endif %}">{{ task.text }}</span>
+                    <a href="{% url 'delete_task' task.id %}">delete</a>
+                </li>
+            {% endfor %}
+        </ul>
+        
+    </div>
+</body>
+</html>
