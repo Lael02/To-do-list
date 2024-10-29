@@ -1,0 +1,45 @@
+.completed {
+    text-decoration: line-through;
+    color: gray;  }
+
+.task-checkbox {
+    cursor: pointer; 
+}
+
+nav { 
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 30px;
+    height: 50px;
+    justify-content: center;
+}
+
+a {
+    position: relative;
+    cursor: pointer;
+    color: #efefee;
+    font-size: 28px;
+    padding: 0.5rem 1rem;
+    transition: color 0.25s;
+}
+
+a::after {
+    position: absolute;
+    content: "";
+    inset: 0;
+    background: white;
+    transform: scaleY(0);
+    z-index: -1;
+    transition: transform 0.45s;
+    border: 10px;
+}
+
+a:hover {
+    color: black;
+    transform: scale(1.1);
+}
+
+a:hover::after {
+    transform: scaleY(1);
+}
