@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"> 
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+    <title>todo list</title> 
+    
+    {% load static %}  <!-- The Django template tag to load static files -->
+    <link rel="stylesheet" href="{% static 'todoapp/style.css' %}"> <!-- The link to external CSS file -->
+
+    <!-- Inline CSS styles (the external css is not working fully) -->
+    <style>
+        /* styles the body */
+        body {
+            background-color: #fff7da; /* Light background color */
+            font-family: Verdana, Geneva, Tahoma, sans-serif; /* Sets default font family */
+        }
+
+        /* Styling for the navigation bar */
+        nav { 
+            width: 100%; 
+            display: flex; 
+            align-items: center; 
+            gap: 30px; 
+            height: 50px; 
+            justify-content: center; 
+            background-color: #fbf0b8; 
+        }
+     
+
+
+        /*this styles the main container*/
+        .container{
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 40px;
+            text-align: center;
+
+        }
+
+
+        /* comment found on external css */
+        a {
+            position: relative; 
+            cursor: pointer; 
+            color: #000000; 
+            font-size: 16px; 
+            padding: 0.5rem 1rem; 
+            transition: color 0.25s; 
+            font-family: Verdana, Geneva, Tahoma, sans-serif; 
+        }
+
+        /* comment found on external css */
+        a::after {
+            position: absolute; 
+            content: ""; 
+            inset: 0; 
+            background: white; 
+            transform: scaleY(0); 
+            z-index: -1; 
+            transition: transform 0.45s; 
+            border: 10px solid transparent; 
+        }
+
+        /*comment found on external css */
+        a:hover {
+            color: rgb(0, 0, 0); 
+            transform: scale(1.1); 
+        }
+
+        /*comment found on external css */
+        a:hover::after {
+            transform: scaleY(1); 
+        }
+
+
+
+        /* Styling the header text */
+        h1 {
+            font-family: Verdana, Geneva, Tahoma, sans-serif; /* Sets font family */
+        }
+
+        /* comment found on external css */
+        .completed {
+            text-decoration: line-through; 
+            color: gray;
+        }
+
+        /* comment found on external css */
+        .task-checkbox {
+            cursor: pointer; 
+        }
+
+        /*styling for the form*/
+        form {
+            display: flex;
+            flex-direction: row;
+            gap: 10px;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 10px;
+       }
+        /*styling the input field*/
+        input[type="text"] {
+            flex: 1; /*allows the field to expand*/
+            padding: 10px;/*padding inside spacing*/
+            font-size: 16px;/*the font size of the text*/
+            border: 3px solid #ffeadb;/*border size and color*/
+            border-radius: 15px;/*makes corners a little round*/
+        }
+
+        /*styling the button*/
+         button {
+            padding: 10px 15px; /*padding on the button*/
+            font-size: 16px;  /*sizing thr font*/
+            border: none;
+            background-color: #fbf0b8;
+            cursor: pointer; /*changes the cursor pointer on hover*/
+            border-radius: 15px;/*makes corners a little round*/
+            transition: background-color 0.3s ease;/*color changes once it is pressed*/
+         }
+
+         button:hover {
+            background-color: #baff66; /*the color the button changes to*/
+         }
+
+        /*styling the responsive form max 600px*/
+         @media (max-width: 600px) {
+            form {
+              flex-direction: column; /*elements will be stacked vertically*/
+             align-items: stretch;/*strech elements*/
+         }
+          /*width of button is now 70% */
+            input[type="text"], button {
+                width: 70%;
+          }
+        }
+
+
+
+           /* styling the task list */
+        ul {
+            list-style-type: none;/*default bullet points */
+            padding: 0;/*padding*/
+        }
+
+            /* Task list items */
+        li {
+            display: flex;                    /* layout for the list items */
+            align-items: center;              /* centers list item contents vertically */
+            justify-content: space-between;   /* Spaces out elements within each list item */
+            padding: 10px;                    /* Adds padding inside each list item */
+            border-bottom: 1px solid #ddd;  /* Adds a light gray border below each item */
+            font-size: 16px;                  /* Sets font size for items */
+        }
+
+           /* list items vertically on smaller screens */
+        @media (max-width: 600px) {
+            li {
+               flex-direction: column;      /* Stacks items vertically */
+               align-items: flex-start;     /* Aligns items to the left */
+            }
+
+            li span, li form, li a {
+               width: 100%;                 /* filling the width */
+               text-align: left;            /* Aligning text to the left */
+               margin-top: 5px;             /* Adding space between the elements */
+          }
+         }
+
+    /* styling for responsive navigation screens up 600px */
+         @media (max-width: 600px) {
+            nav {
+               flex-direction: column;     /* Stacks them vertically */
+               align-items: center;        /* Centers them */
+         }
+
+             nav a {
+                font-size: 14px;           /* Reduces the font size for mobile */
+                width: 100%;               /* full width */
+                text-align: center;        /* Centers the text */
+                padding: 10px;             /* Adds padding */
+             }
+        }
+
+
+
+    </style>
+
+</head>
+<body>
+    <!-- Creating the navigation bar -->
+    <nav>
+        <a>Home</a>
+        <a>To complete</a>
+        <a>Completed</a>
+        <a>FAQ</a>
+    </nav>
+<br><br>
+    <!-- Main content container -->
+    <div class="container">
+        <h1>Welcome! What do you need to do today?</h1> <!-- Header text -->
+
+        <!-- Form to add a new task -->
+        <form action="{% url 'add_task' %}" method="POST">
+            {% csrf_token %} <!-- token for security in Django form -->
+            <input type="text" name="task" placeholder="Add a new task..." required> <!-- Task input field -->
+            <button type="submit">Add task</button> <!-- Submit button for a adding task -->
+        </form>
+
+        <!-- List of tasks -->
+        <ul>
+            {% for task in tasks %} <!-- Loops through each task in the list of tasks-->
+                <li>
+                    <!-- Form for marking a task as complete -->
+                    <form action="{% url 'complete_task' task.id %}" method="POST" style="display:inline;">
+                        {% csrf_token %} <!-- token for security -->
+                        <!-- Checkbox to mark a task as completed and it submits on change -->
+                        <input type="checkbox" class="task-checkbox" onchange="this.form.submit()" {% if task.completed %}checked{% endif %}>
+                    </form>
+
+                    <!-- Displays task text if task is marked as completed -->
+                    <span class="{% if task.completed %}completed{% endif %}">{{ task.text }}</span>
+                    
+                    <!-- Link to delete the task -->
+                    <a href="{% url 'delete_task' task.id %}">delete</a>
+                </li>
+            {% endfor %}
+        </ul>
+        
+    </div>
+</body>
+</html>
